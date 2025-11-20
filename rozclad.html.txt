@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Розклад НУ «ОМА»</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #eef2f7;
+        color: #222;
+    }
+
+    header {
+        background: #003366;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .week-switch {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .week-switch button {
+        padding: 10px 20px;
+        border: none;
+        background: #c7d3e4;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 8px;
+        margin: 0 6px;
+        transition: 0.25s;
+    }
+
+    .week-switch button.active {
+        background: #003366;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .day {
+        margin: 20px auto;
+        width: 95%;
+        max-width: 800px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    .day h2 {
+        margin-top: 0;
+        color: #003366;
+        border-bottom: 2px solid #00336633;
+        padding-bottom: 5px;
+    }
+
+    .pair-block {
+        margin-bottom: 25px;
+    }
+
+    .pair-title {
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #1a3f66;
+    }
+
+    .subject {
+        background: #d9e6f7;
+        padding: 10px 15px;
+        margin: 6px 0;
+        border-radius: 8px;
+        font-size: 15px;
+        border-left: 5px solid #0051a8;
+    }
+
+    .lecture {
+        background: #d6e8ff;
+        border-left-color: #0066cc;
+    }
+
+    .practice {
+        background: #e5ffe5;
+        border-left-color: #2eb82e;
+    }
+
+    .fade {
+        animation: fade 0.35s ease;
+    }
+
+    @keyframes fade {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
+</head>
+
+<body>
+
+<header>Розклад занять • НУ "ОМА" для групи 1107</header>
+
+<div class="week-switch">
+    <button id="oddBtn" class="active">Непарний тиждень</button>
+    <button id="evenBtn">Парний тиждень</button>
+</div>
+
+<div id="schedule"></div>
+
+<script>
+const scheduleData = {
+    odd: {
+        "Понеділок": [
+            { pair: 1, type: "lecture", subject: "Нарисна геометрія та інженерна графіка", teacher: "Корх М.В.", group: "Лекція" },
+            { pair: 2, type: "lecture", subject: "Фізика", teacher: "Горюк А.А.", group: "Лекція" }
+        ],
+
+        "Вівторок": [
+            { pair: 1, type: "lecture", subject: "Безпека та охорона на морі", teacher: "Мамкічев М.А.", group: "Лекція" },
+            { pair: 2, type: "lecture", subject: "Вища математика", teacher: "Кирилова О.І.", group: "Лекція" },
+            { pair: 3, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В. / Хроленко О.А.", group: "Практичне заняття" }
+        ],
+
+        "Середа": [
+            { pair: 1, type: "practice", subject: "Вища математика", teacher: "Демидов О.В.", group: "Практичне заняття" },
+            { pair: 2, type: "practice", subject: "Нарисна геометрія та інженерна графіка", teacher: "Корх М.В.", group: "Практичне заняття" }
+        ],
+
+        "Четвер": [
+            { pair: 1, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В.", group: "Практичне заняття" },
+            { pair: 2, type: "practice", subject: "Історія та культура України", teacher: "Марущак Я.С.", group: "Практичне заняття" },
+            { pair: 3, type: "practice", subject: "Ділова українська мова", teacher: "Кравець І.В.", group: "Практичне заняття" }
+        ],
+
+        "Пʼятниця": [
+            { pair: 1, type: "practice", subject: "Безпека та охорона на морі", teacher: "Розлуцький О.М.", group: "Практине заняття" },
+            { pair: 2, type: "practice", subject: "Теорія та будова судна", teacher: "Кучер Ю.П.", group: "Практичне заняття" },
+            { pair: 3, type: "practice", subject: "Фізика (Лаб)", teacher: "Горюк А.А.", group: "Практичне заняття" }
+        ]
+    },
+
+    even: {
+        "Понеділок": [
+            { pair: 1, type: "lecture", subject: "Теорія та будова судна", teacher: "Кучер Ю.П.", group: "Лекція" },
+            { pair: 2, type: "lecture", subject: "Фізика", teacher: "Горюк А.А.", group: "Лекція" },
+            { pair: 3, type: "lecture", subject: "Безпека та охорона на морі", teacher: "Мамкічев М.А.", group: "Лекція" }
+        ],
+
+        "Вівторок": [
+            { pair: 1, type: "lecture", subject: "Безпека та охорона на морі", teacher: "Мамкічев М.А.", group: "Лекція" },
+            { pair: 2, type: "lecture", subject: "Вища математика", teacher: "Кирилова О.І.", group: "Лекція" },
+            { pair: 3, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В. / Хроленко О.А.", group: "Практичне заняття" }
+        ],
+
+        "Середа": [
+            { pair: 1, type: "practice", subject: "Вища математика", teacher: "Демидов О.В.", group: "Практичне заняття" },
+            { pair: 2, type: "practice", subject: "Нарисна геометрія та інженерна графіка", teacher: "Опришко М.О. / Корх М.В.", group: "Практичне заняття" },
+            { pair: 3, type: "lecture", subject: "Історія та культура України", teacher: "Марущак Я.С.", group: "Лекція" }
+        ],
+
+        "Четвер": [
+            { pair: 1, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В.", group: "Практичне заняття" },
+            { pair: 3, type: "practice", subject: "Ділова українська мова", teacher: "Кравець І.В.", group: "Практичне заняття" }
+        ],
+
+        "Пʼятниця": [
+            { pair: 2, type: "practice", subject: "Теорія та будова судна", teacher: "Кучер Ю.П.", group: "Практичне заняття" },
+            { pair: 3, type: "practice", subject: "Фізика (Лаб)", teacher: "Горюк А.А.", group: "Практичне заняття" }
+        ]
+    }
+};
+
+function renderSchedule(type) {
+    const root = document.getElementById("schedule");
+    root.innerHTML = "";
+
+    Object.entries(scheduleData[type]).forEach(([day, lessons]) => {
+        const div = document.createElement("div");
+        div.className = "day fade";
+
+        div.innerHTML = `<h2>${day}</h2>`;
+
+        let pairs = {};
+
+        lessons.forEach(item => {
+            if (!pairs[item.pair]) pairs[item.pair] = [];
+            pairs[item.pair].push(item);
+        });
+
+        Object.keys(pairs).sort((a,b)=>a-b).forEach(pairNum => {
+            const block = document.createElement("div");
+            block.className = "pair-block";
+
+            block.innerHTML = `<div class="pair-title">${pairNum}-та пара</div>`;
+
+            pairs[pairNum].forEach(item => {
+                const s = document.createElement("div");
+                s.className = `subject ${item.type}`;
+                s.innerHTML = `
+                    <b>${item.subject}</b><br>
+                    <span>${item.teacher}</span><br>
+                    <span>${item.group}</span>
+                `;
+                block.appendChild(s);
+            });
+
+            div.appendChild(block);
+        });
+
+        root.appendChild(div);
+    });
+}
+
+document.getElementById("oddBtn").onclick = () => {
+    oddBtn.classList.add("active");
+    evenBtn.classList.remove("active");
+    renderSchedule("odd");
+};
+
+document.getElementById("evenBtn").onclick = () => {
+    evenBtn.classList.add("active");
+    oddBtn.classList.remove("active");
+    renderSchedule("even");
+};
+
+renderSchedule("odd");
+</script>
+
+</body>
+</html>
