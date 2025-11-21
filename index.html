@@ -6,60 +6,113 @@
 <title>Розклад НУ «ОМА»</title>
 
 <style>
+    :root {
+        --bg: #eef2f7;
+        --text: #222;
+        --card: #ffffff;
+        --accent: #003366;
+        --secondary: #c7d3e4;
+        --shadow: rgba(0,0,0,0.12);
+
+        --lecture: #d6e8ff;
+        --lecture-border: #0066cc;
+
+        --practice: #e5ffe5;
+        --practice-border: #2eb82e;
+    }
+
+    .dark {
+        --bg: #0f1116;
+        --text: #f0f0f0;
+        --card: #1a1d23;
+        --accent: #4da3ff;
+        --secondary: #2b3442;
+        --shadow: rgba(0,0,0,0.45);
+
+        --lecture: #1f324a;
+        --lecture-border: #4da3ff;
+
+        --practice: #1e3a2f;
+        --practice-border: #3bdc7c;
+    }
+
     body {
         margin: 0;
         font-family: "Segoe UI", sans-serif;
-        background: #eef2f7;
-        color: #222;
+        background: var(--bg);
+        color: var(--text);
+        transition: 0.3s ease-in-out;
     }
 
     header {
-        background: #003366;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--accent);
         color: white;
-        padding: 20px;
-        text-align: center;
+        padding: 15px 20px;
+        box-shadow: 0 4px 10px var(--shadow);
+    }
+
+    header img.logo {
+        height: 40px;
+        margin-right: 12px;
+    }
+
+    header .title {
         font-size: 24px;
         font-weight: bold;
     }
 
-    .week-switch {
+    .top-controls {
         display: flex;
         justify-content: center;
+        align-items: center;
+        gap: 15px;
         margin: 20px 0;
+        flex-wrap: wrap;
     }
 
-    .week-switch button {
-        padding: 10px 20px;
+    .week-switch button,
+    #themeBtn {
+        padding: 10px 18px;
         border: none;
-        background: #c7d3e4;
+        background: var(--secondary);
+        color: var(--text);
         cursor: pointer;
         font-size: 16px;
-        border-radius: 8px;
-        margin: 0 6px;
+        border-radius: 10px;
         transition: 0.25s;
+        box-shadow: 0 2px 5px var(--shadow);
     }
 
     .week-switch button.active {
-        background: #003366;
+        background: var(--accent);
         color: white;
         transform: scale(1.05);
+    }
+
+    #themeBtn:hover {
+        transform: scale(1.05);
+        background: var(--accent);
+        color: white;
     }
 
     .day {
         margin: 20px auto;
         width: 95%;
-        max-width: 800px;
-        background: white;
-        border-radius: 12px;
+        max-width: 850px;
+        background: var(--card);
+        border-radius: 14px;
         padding: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        box-shadow: 0 4px 15px var(--shadow);
     }
 
     .day h2 {
-        margin-top: 0;
-        color: #003366;
+        margin: 0 0 10px;
+        color: var(--accent);
         border-bottom: 2px solid #00336633;
-        padding-bottom: 5px;
+        padding-bottom: 6px;
     }
 
     .pair-block {
@@ -69,27 +122,34 @@
     .pair-title {
         font-weight: 700;
         font-size: 18px;
+        margin-bottom: 6px;
+        color: var(--accent);
+    }
+
+    .pair-time {
+        font-size: 14px;
+        font-weight: 600;
         margin-bottom: 10px;
-        color: #1a3f66;
+        color: #666;
     }
 
     .subject {
-        background: #d9e6f7;
-        padding: 10px 15px;
-        margin: 6px 0;
-        border-radius: 8px;
+        background: var(--secondary);
+        padding: 12px 15px;
+        margin: 8px 0;
+        border-radius: 10px;
         font-size: 15px;
-        border-left: 5px solid #0051a8;
+        border-left: 6px solid var(--accent);
     }
 
     .lecture {
-        background: #d6e8ff;
-        border-left-color: #0066cc;
+        background: var(--lecture);
+        border-left-color: var(--lecture-border);
     }
 
     .practice {
-        background: #e5ffe5;
-        border-left-color: #2eb82e;
+        background: var(--practice);
+        border-left-color: var(--practice-border);
     }
 
     .fade {
@@ -100,82 +160,104 @@
         from { opacity: 0; transform: translateY(10px); }
         to   { opacity: 1; transform: translateY(0); }
     }
+
+    @media (max-width: 600px) {
+        header .title {
+            font-size: 20px;
+        }
+
+        .subject {
+            font-size: 14px;
+        }
+
+        .pair-title {
+            font-size: 16px;
+        }
+    }
 </style>
 </head>
 
 <body>
 
-<header>Розклад занять • НУ "ОМА" для групи 1107</header>
+<header>
+    <!-- Логотип НУ ОМА — заміни src на свій файл, якщо треба -->
+    <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/7/7d/NU_OMA_emblem.svg" alt="Логотип НУ ОМА">
+    <div class="title">Розклад занять • НУ "ОМА" • Група 1107</div>
+</header>
 
-<div class="week-switch">
-    <button id="oddBtn" class="active">Непарний тиждень</button>
-    <button id="evenBtn">Парний тиждень</button>
+<div class="top-controls">
+    <div class="week-switch">
+        <button id="oddBtn" class="active">Непарний</button>
+        <button id="evenBtn">Парний</button>
+    </div>
+    <button id="themeBtn">🌙 Темна тема</button>
 </div>
 
 <div id="schedule"></div>
 
 <script>
+const pairTimes = {
+    1: "09:00 – 10:20",
+    2: "10:30 – 11:50",
+    3: "12:10 – 13:30"
+};
+
 const scheduleData = {
     odd: {
         "Понеділок": [
             { pair: 1, type: "lecture", subject: "Нарисна геометрія та інженерна графіка", teacher: "Корх М.В.", group: "Лекція" },
             { pair: 2, type: "lecture", subject: "Фізика", teacher: "Горюк А.А.", group: "Лекція" }
         ],
-
         "Вівторок": [
             { pair: 1, type: "lecture", subject: "Безпека та охорона на морі", teacher: "Мамкічев М.А.", group: "Лекція" },
             { pair: 2, type: "lecture", subject: "Вища математика", teacher: "Кирилова О.І.", group: "Лекція" },
             { pair: 3, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В. / Хроленко О.А.", group: "Практичне заняття" }
         ],
-
         "Середа": [
             { pair: 1, type: "practice", subject: "Вища математика", teacher: "Демидов О.В.", group: "Практичне заняття" },
             { pair: 2, type: "practice", subject: "Нарисна геометрія та інженерна графіка", teacher: "Корх М.В.", group: "Практичне заняття" }
         ],
-
         "Четвер": [
             { pair: 1, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В.", group: "Практичне заняття" },
             { pair: 2, type: "practice", subject: "Історія та культура України", teacher: "Марущак Я.С.", group: "Практичне заняття" },
             { pair: 3, type: "practice", subject: "Ділова українська мова", teacher: "Кравець І.В.", group: "Практичне заняття" }
         ],
-
         "Пʼятниця": [
-            { pair: 1, type: "practice", subject: "Безпека та охорона на морі", teacher: "Розлуцький О.М.", group: "Практине заняття" },
+            { pair: 1, type: "practice", subject: "Безпека та охорона на морі", teacher: "Розлуцький О.М.", group: "Практичне заняття" },
             { pair: 2, type: "practice", subject: "Теорія та будова судна", teacher: "Кучер Ю.П.", group: "Практичне заняття" },
             { pair: 3, type: "practice", subject: "Фізика (Лаб)", teacher: "Горюк А.А.", group: "Практичне заняття" }
         ]
     },
-
     even: {
         "Понеділок": [
             { pair: 1, type: "lecture", subject: "Теорія та будова судна", teacher: "Кучер Ю.П.", group: "Лекція" },
             { pair: 2, type: "lecture", subject: "Фізика", teacher: "Горюк А.А.", group: "Лекція" },
             { pair: 3, type: "lecture", subject: "Безпека та охорона на морі", teacher: "Мамкічев М.А.", group: "Лекція" }
         ],
-
         "Вівторок": [
             { pair: 1, type: "lecture", subject: "Безпека та охорона на морі", teacher: "Мамкічев М.А.", group: "Лекція" },
             { pair: 2, type: "lecture", subject: "Вища математика", teacher: "Кирилова О.І.", group: "Лекція" },
             { pair: 3, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В. / Хроленко О.А.", group: "Практичне заняття" }
         ],
-
         "Середа": [
             { pair: 1, type: "practice", subject: "Вища математика", teacher: "Демидов О.В.", group: "Практичне заняття" },
             { pair: 2, type: "practice", subject: "Нарисна геометрія та інженерна графіка", teacher: "Опришко М.О. / Корх М.В.", group: "Практичне заняття" },
             { pair: 3, type: "lecture", subject: "Історія та культура України", teacher: "Марущак Я.С.", group: "Лекція" }
         ],
-
         "Четвер": [
             { pair: 1, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В.", group: "Практичне заняття" },
             { pair: 3, type: "practice", subject: "Ділова українська мова", teacher: "Кравець І.В.", group: "Практичне заняття" }
         ],
-
         "Пʼятниця": [
             { pair: 2, type: "practice", subject: "Теорія та будова судна", teacher: "Кучер Ю.П.", group: "Практичне заняття" },
             { pair: 3, type: "practice", subject: "Фізика (Лаб)", teacher: "Горюк А.А.", group: "Практичне заняття" }
         ]
     }
 };
+
+function getPairName(num) {
+    return num === 3 ? `${num}-я пара` : `${num}-а пара`;
+}
 
 function renderSchedule(type) {
     const root = document.getElementById("schedule");
@@ -188,7 +270,6 @@ function renderSchedule(type) {
         div.innerHTML = `<h2>${day}</h2>`;
 
         let pairs = {};
-
         lessons.forEach(item => {
             if (!pairs[item.pair]) pairs[item.pair] = [];
             pairs[item.pair].push(item);
@@ -197,9 +278,10 @@ function renderSchedule(type) {
         Object.keys(pairs).sort((a,b)=>a-b).forEach(pairNum => {
             const block = document.createElement("div");
             block.className = "pair-block";
-
-            block.innerHTML = `<div class="pair-title">${pairNum}-та пара</div>`;
-
+            block.innerHTML = `
+                <div class="pair-title">${getPairName(Number(pairNum))}</div>
+                <div class="pair-time">${pairTimes[pairNum]}</div>
+            `;
             pairs[pairNum].forEach(item => {
                 const s = document.createElement("div");
                 s.className = `subject ${item.type}`;
@@ -210,7 +292,6 @@ function renderSchedule(type) {
                 `;
                 block.appendChild(s);
             });
-
             div.appendChild(block);
         });
 
@@ -218,12 +299,23 @@ function renderSchedule(type) {
     });
 }
 
+const themeBtn = document.getElementById("themeBtn");
+themeBtn.onclick = () => {
+    document.body.classList.toggle("dark");
+    const dark = document.body.classList.contains("dark");
+    themeBtn.textContent = dark ? "☀️ Світла тема" : "🌙 Темна тема";
+    localStorage.setItem("theme", dark ? "dark" : "light");
+};
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+    themeBtn.textContent = "☀️ Світла тема";
+}
+
 document.getElementById("oddBtn").onclick = () => {
     oddBtn.classList.add("active");
     evenBtn.classList.remove("active");
     renderSchedule("odd");
 };
-
 document.getElementById("evenBtn").onclick = () => {
     evenBtn.classList.add("active");
     oddBtn.classList.remove("active");
