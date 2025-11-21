@@ -180,7 +180,6 @@
 <body>
 
 <header>
-    <!-- Логотип НУ ОМА — заміни src на свій файл, якщо треба -->
     <img class="logo" src="NU_OMA_emblem.svg.png" alt="Логотип НУ ОМА">
     <div class="title">Розклад занять • НУ "ОМА" • Група 1107</div>
 </header>
@@ -299,34 +298,51 @@ function renderSchedule(type) {
     });
 }
 
+// ---------- Тема ----------
 const themeBtn = document.getElementById("themeBtn");
+
+function applyTheme() {
+    const savedTheme = localStorage.getItem("theme");
+    let dark;
+
+    if (savedTheme) {
+        dark = savedTheme === "dark";
+    } else {
+        dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    document.body.classList.toggle("dark", dark);
+    themeBtn.textContent = dark ? "☀️ Світла тема" : "🌙 Темна тема";
+}
+
 themeBtn.onclick = () => {
     document.body.classList.toggle("dark");
     const dark = document.body.classList.contains("dark");
     themeBtn.textContent = dark ? "☀️ Світла тема" : "🌙 Темна тема";
     localStorage.setItem("theme", dark ? "dark" : "light");
 };
-if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark");
-    themeBtn.textContent = "☀️ Світла тема";
-}
 
-document.getElementById("oddBtn").onclick = () => {
+// Применяем тему при загрузке страницы
+applyTheme();
+
+// ---------- Переключение недель ----------
+const oddBtn = document.getElementById("oddBtn");
+const evenBtn = document.getElementById("evenBtn");
+
+oddBtn.onclick = () => {
     oddBtn.classList.add("active");
     evenBtn.classList.remove("active");
     renderSchedule("odd");
 };
-document.getElementById("evenBtn").onclick = () => {
+evenBtn.onclick = () => {
     evenBtn.classList.add("active");
     oddBtn.classList.remove("active");
     renderSchedule("even");
 };
 
+// ---------- Первоначальная загрузка ----------
 renderSchedule("odd");
 </script>
 
 </body>
 </html>
-
-
-
