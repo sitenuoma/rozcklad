@@ -227,6 +227,7 @@ const scheduleData = {
             { pair: 3, type: "practice", subject: "Фізика (Лаб)", teacher: "Горюк А.А.", group: "Практичне заняття" }
         ]
     },
+
     even: {
         "Понеділок": [
             { pair: 1, type: "lecture", subject: "Теорія та будова судна", teacher: "Кучер Ю.П.", group: "Лекція" },
@@ -245,7 +246,8 @@ const scheduleData = {
         ],
         "Четвер": [
             { pair: 1, type: "practice", subject: "Англійська мова", teacher: "Бондаренко Є.В.", group: "Практичне заняття" },
-            { pair: 3, type: "practice", subject: "Ділова українська мова", teacher: "Кравець І.В.", group: "Практичне заняття" }
+
+            { pair: 2, type: "practice", subject: "Ділова українська мова", teacher: "Кравець І.В.", group: "Практичне заняття" }
         ],
         "Пʼятниця": [
             { pair: 2, type: "practice", subject: "Теорія та будова судна", teacher: "Кучер Ю.П.", group: "Практичне заняття" },
@@ -253,6 +255,18 @@ const scheduleData = {
         ]
     }
 };
+
+/* --- НОВАЯ функция определения парной недели --- */
+/* 1 декабря 2025 — ПОНЕДЕЛЬНИК — ПЕРВАЯ ПАРНАЯ НЕДЕЛЯ */
+function isEvenWeek() {
+    const start = new Date(2025, 11, 1); // 1 декабря 2025
+    const now = new Date();
+
+    const diff = now - start;
+    const weeksPassed = Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
+
+    return weeksPassed % 2 === 0;
+}
 
 function getPairName(num) {
     return num === 3 ? `${num}-я пара` : `${num}-а пара`;
@@ -298,7 +312,7 @@ function renderSchedule(type) {
     });
 }
 
-// ---------- Тема ----------
+/* ---------- Тема ---------- */
 const themeBtn = document.getElementById("themeBtn");
 
 function applyTheme() {
@@ -322,10 +336,10 @@ themeBtn.onclick = () => {
     localStorage.setItem("theme", dark ? "dark" : "light");
 };
 
-// Применяем тему при загрузке страницы
 applyTheme();
 
-// ---------- Переключение недель ----------
+/* ---------- Кнопки переключения ---------- */
+
 const oddBtn = document.getElementById("oddBtn");
 const evenBtn = document.getElementById("evenBtn");
 
@@ -334,14 +348,26 @@ oddBtn.onclick = () => {
     evenBtn.classList.remove("active");
     renderSchedule("odd");
 };
+
 evenBtn.onclick = () => {
     evenBtn.classList.add("active");
     oddBtn.classList.remove("active");
     renderSchedule("even");
 };
 
-// ---------- Первоначальная загрузка ----------
-renderSchedule("odd");
+/* ---------- Автоматическая установка недели ---------- */
+
+window.onload = () => {
+    if (isEvenWeek()) {
+        evenBtn.classList.add("active");
+        oddBtn.classList.remove("active");
+        renderSchedule("even");
+    } else {
+        oddBtn.classList.add("active");
+        evenBtn.classList.remove("active");
+        renderSchedule("odd");
+    }
+};
 </script>
 
 </body>
