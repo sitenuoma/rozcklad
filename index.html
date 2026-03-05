@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Розклад НУ «ОМА»</title>
+
 <style>
 :root {
     --bg: #eef2f7;
@@ -44,9 +45,7 @@ body {
 }
 
 header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
     background: var(--accent);
     color: white;
     padding: 15px;
@@ -55,6 +54,12 @@ header {
 header .title {
     font-size: 22px;
     font-weight: bold;
+}
+
+header .subtitle {
+    margin-top: 5px;
+    font-size: 14px;
+    opacity: 0.9;
 }
 
 .top-controls {
@@ -101,7 +106,6 @@ button.active {
 .pair-time {
     font-size: 13px;
     color: #666;
-    margin-bottom: 5px;
 }
 
 .subject {
@@ -122,7 +126,6 @@ button.active {
     border-left-color: var(--practice-border);
 }
 
-/* Модальное окно для выбора подгруппы */
 .modal {
     position: fixed;
     inset: 0;
@@ -137,7 +140,7 @@ button.active {
     padding: 25px;
     border-radius: 12px;
     text-align: center;
-    width: 280px;
+    width: 300px;
 }
 
 .modal-content button {
@@ -147,14 +150,16 @@ button.active {
 }
 </style>
 </head>
+
 <body>
 
 <header>
 <div class="title">Розклад занять • Група 1107</div>
+<div class="subtitle" id="currentInfo"></div>
 </header>
 
 <div class="top-controls">
-    <button id="oddBtn" class="active">Непарний</button>
+    <button id="oddBtn">Непарний</button>
     <button id="evenBtn">Парний</button>
     <button id="themeBtn">🌙 Темна тема</button>
 </div>
@@ -163,9 +168,9 @@ button.active {
 
 <div class="modal" id="groupModal">
     <div class="modal-content">
-        <h3>Оберіть підгрупу</h3>
-        <button id="firstGroup">1 підгрупа</button>
-        <button id="secondGroup">2 підгрупа</button>
+        <h3 id="modalTitle">Оберіть підгрупу</h3>
+        <button id="firstGroup"></button>
+        <button id="secondGroup"></button>
         <button onclick="closeModal()">Скасувати</button>
     </div>
 </div>
@@ -183,7 +188,9 @@ const links = {
     eng1: "https://us04web.zoom.us/j/8860448914?pwd=V090WXUycDIzUjNMWjNaZjVxN05Pdz09",
     eng2: "https://us04web.zoom.us/j/4669448208?pwd=KzRHMGpyQ280Y211d1FiakdZZmppdz09",
     inf1: "https://us02web.zoom.us/j/7306854563?pwd=VnlLcWRMWGJNWjhrbkRFdWNwa1hvZz09",
-    inf2: "https://us02web.zoom.us/j/8714061963?pwd=MEZ6cDBDWm1VTFlacEhjYmVIOWkyQT09"
+    inf2: "https://us02web.zoom.us/j/8714061963?pwd=MEZ6cDBDWm1VTFlacEhjYmVIOWkyQT09",
+    econPractice: "https://us04web.zoom.us/j/2339207979?pwd=RmpDbXFPd1ZGaGUxSE5YbG5XN1dPdz09",
+    econLecture: "https://us02web.zoom.us/j/4850388157?pwd=V2JLUURCY3FxNXNWZHMrSWVpK09CQT09&omn=81464116870"
 };
 
 let currentLinks = null;
@@ -192,8 +199,11 @@ function openLink(link){
     window.open(link, "_blank");
 }
 
-function openModal(first, second){
-    currentLinks = {first, second};
+function openModal(config){
+    currentLinks = config;
+    document.getElementById("modalTitle").innerText = config.title;
+    document.getElementById("firstGroup").innerText = config.firstText;
+    document.getElementById("secondGroup").innerText = config.secondText;
     document.getElementById("groupModal").style.display = "flex";
 }
 
@@ -202,13 +212,44 @@ function closeModal(){
 }
 
 document.getElementById("firstGroup").onclick = () => {
-    openLink(currentLinks.first);
+    openLink(currentLinks.firstLink);
     closeModal();
 };
 
 document.getElementById("secondGroup").onclick = () => {
-    openLink(currentLinks.second);
+    openLink(currentLinks.secondLink);
     closeModal();
+};
+
+function getWeekType(){
+    const now = new Date();
+    if(now.getDay() === 0){
+        now.setDate(now.getDate() + 1);
+    }
+    const firstThursday = new Date(now.getFullYear(),0,4);
+    const weekNumber = Math.ceil((((now - firstThursday) / 86400000) + firstThursday.getDay()+1)/7);
+    return (weekNumber % 2 === 0) ? "even" : "odd";
+}
+
+function updateHeaderInfo(weekType){
+    const now = new Date();
+    const options = { day: 'numeric', month: 'long' };
+    const dateStr = now.toLocaleDateString('uk-UA', options);
+    const weekText = weekType === "even" ? "Парний" : "Непарний";
+    document.getElementById("currentInfo").innerText =
+        `Сьогодні: ${dateStr} • Поточний тиждень: ${weekText}`;
+}
+
+const savedTheme = localStorage.getItem("theme");
+if(savedTheme === "dark"){
+    document.body.classList.add("dark");
+}
+
+document.getElementById("themeBtn").onclick = ()=>{
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme",
+        document.body.classList.contains("dark") ? "dark" : "light"
+    );
 };
 
 const scheduleData = {
@@ -218,17 +259,17 @@ odd: {
         {pair:2,type:"practice",subject:"Фізика (Лаб)",teacher:"Горюк А.А.",link:links.physics}
     ],
     "Вівторок":[
-        {pair:2,type:"lecture",subject:"Інформаційні технології",teacher:"Левінський М.В.",subgroupInf:true},
-        {pair:3,type:"practice",subject:"Економічна теорія",teacher:"Яворська А.Ф."}
+        {pair:2,type:"lecture",subject:"Інформаційні технології",teacher:"Левінський М.В."},
+        {pair:3,type:"practice",subject:"Економічна теорія",teacher:"Яворська А.Ф.",link:links.econPractice}
     ],
     "Середа":[
         {pair:1,type:"practice",subject:"Океанські шляхи світу",teacher:"Кульбацький А.А."},
-        {pair:2,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко",subgroup:true},
-        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко",subgroup:true}
+        {pair:2,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"},
+        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"}
     ],
     "Четвер":[
         {pair:1,type:"lecture",subject:"Фізика",teacher:"Горюк А.А.",link:links.physics},
-        {pair:2,type:"practice",subject:"Інформаційні технології",teacher:"Левінський / Удолатій",subgroupInf:true},
+        {pair:2,type:"practice",subject:"Інформаційні технології",teacher:"Левінський / Удолатій"},
         {pair:3,type:"practice",subject:"Океанські шляхи світу",teacher:"Кульбацький А.А."}
     ],
     "Пʼятниця":[
@@ -244,27 +285,28 @@ even: {
     ],
     "Вівторок":[
         {pair:1,type:"lecture",subject:"Морська практика",teacher:"Петриченко О.О."},
-        {pair:2,type:"lecture",subject:"Інформаційні технології",teacher:"Левінський М.В.",subgroupInf:true},
-        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко",subgroup:true}
+        {pair:2,type:"lecture",subject:"Інформаційні технології",teacher:"Левінський М.В."},
+        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"}
     ],
     "Середа":[
         {pair:1,type:"practice",subject:"Суспільство і держава",teacher:"Скоробагатько А.В."},
-        {pair:2,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко",subgroup:true},
-        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко",subgroup:true}
+        {pair:2,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"},
+        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"}
     ],
     "Четвер":[
         {pair:1,type:"lecture",subject:"Фізика",teacher:"Горюк А.А.",link:links.physics},
-        {pair:2,type:"practice",subject:"Інформаційні технології",teacher:"Левінський / Удолатій",subgroupInf:true}
+        {pair:2,type:"practice",subject:"Інформаційні технології",teacher:"Левінський / Удолатій"}
     ],
     "Пʼятниця":[
         {pair:1,type:"lecture",subject:"Океанські шляхи світу",teacher:"Кульбацький А.А."},
-        {pair:2,type:"lecture",subject:"Економічна теорія",teacher:"Голубкова І.А."},
+        {pair:2,type:"lecture",subject:"Економічна теорія",teacher:"Голубкова І.А.",link:links.econLecture},
         {pair:3,type:"practice",subject:"Вища математика",teacher:"Демидов О.В.",link:links.math}
     ]
 }
 };
 
 function renderSchedule(type){
+    updateHeaderInfo(type);
     const root=document.getElementById("schedule");
     root.innerHTML="";
     Object.entries(scheduleData[type]).forEach(([day,lessons])=>{
@@ -277,8 +319,24 @@ function renderSchedule(type){
             s.innerHTML=`<div class="pair-title">${item.pair}-я пара | <span class="pair-time">${pairTimes[item.pair]}</span></div><b>${item.subject}</b><br>${item.teacher}`;
             s.onclick=()=>{
                 if(item.link) openLink(item.link);
-                else if(item.subgroup) openModal(links.eng1,links.eng2);
-                else if(item.subgroupInf) openModal(links.inf1,links.inf2);
+                else if(item.subject==="Англійська мова"){
+                    openModal({
+                        title:"Англійська мова",
+                        firstText:"1 підгрупа — Бондаренко",
+                        secondText:"2 підгрупа — Хроленко",
+                        firstLink:links.eng1,
+                        secondLink:links.eng2
+                    });
+                }
+                else if(item.subject==="Інформаційні технології"){
+                    openModal({
+                        title:"Інформаційні технології",
+                        firstText:"1 підгрупа — Левінський",
+                        secondText:"2 підгрупа — Удолатій Вікторія",
+                        firstLink:links.inf1,
+                        secondLink:links.inf2
+                    });
+                }
             };
             div.appendChild(s);
         });
@@ -288,24 +346,28 @@ function renderSchedule(type){
 
 const oddBtn=document.getElementById("oddBtn");
 const evenBtn=document.getElementById("evenBtn");
-const themeBtn=document.getElementById("themeBtn");
 
 oddBtn.onclick=()=>{
     oddBtn.classList.add("active");
     evenBtn.classList.remove("active");
     renderSchedule("odd");
 };
+
 evenBtn.onclick=()=>{
     evenBtn.classList.add("active");
     oddBtn.classList.remove("active");
     renderSchedule("even");
 };
 
-themeBtn.onclick=()=>{
-    document.body.classList.toggle("dark");
-};
-
-renderSchedule("odd");
+const currentWeek = getWeekType();
+if(currentWeek === "even"){
+    evenBtn.classList.add("active");
+    renderSchedule("even");
+}else{
+    oddBtn.classList.add("active");
+    renderSchedule("odd");
+}
 </script>
+
 </body>
 </html>
