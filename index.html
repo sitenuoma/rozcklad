@@ -113,7 +113,6 @@ button.active {
     margin: 8px 0;
     border-radius: 10px;
     border-left: 6px solid;
-    cursor: pointer;
 }
 
 .lecture {
@@ -124,29 +123,6 @@ button.active {
 .practice {
     background: var(--practice);
     border-left-color: var(--practice-border);
-}
-
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    text-align: center;
-    width: 300px;
-}
-
-.modal-content button {
-    display: block;
-    width: 100%;
-    margin-top: 10px;
 }
 </style>
 </head>
@@ -166,59 +142,11 @@ button.active {
 
 <div id="schedule"></div>
 
-<div class="modal" id="groupModal">
-    <div class="modal-content">
-        <h3 id="modalTitle">Оберіть підгрупу</h3>
-        <button id="firstGroup"></button>
-        <button id="secondGroup"></button>
-        <button onclick="closeModal()">Скасувати</button>
-    </div>
-</div>
-
 <script>
 const pairTimes = {
     1: "09:00 – 10:20",
     2: "10:30 – 11:50",
     3: "12:10 – 13:30"
-};
-
-const links = {
-    math: "https://us04web.zoom.us/j/4058033805?pwd=p2X0Sb1AHFhx3c6CxyQPotOlPVGHfa.1",
-    physics: "https://us05web.zoom.us/j/7868767875?pwd=Nk1haktCWkJQbUJNN244ZDNwVFJ5UT09&omn=82777412304",
-    eng1: "https://us04web.zoom.us/j/8860448914?pwd=V090WXUycDIzUjNMWjNaZjVxN05Pdz09",
-    eng2: "https://us04web.zoom.us/j/4669448208?pwd=KzRHMGpyQ280Y211d1FiakdZZmppdz09",
-    inf1: "https://us02web.zoom.us/j/7306854563?pwd=VnlLcWRMWGJNWjhrbkRFdWNwa1hvZz09",
-    inf2: "https://us02web.zoom.us/j/8714061963?pwd=MEZ6cDBDWm1VTFlacEhjYmVIOWkyQT09",
-    econPractice: "https://us04web.zoom.us/j/2339207979?pwd=RmpDbXFPd1ZGaGUxSE5YbG5XN1dPdz09",
-    econLecture: "https://us02web.zoom.us/j/4850388157?pwd=V2JLUURCY3FxNXNWZHMrSWVpK09CQT09&omn=81464116870"
-};
-
-let currentLinks = null;
-
-function openLink(link){
-    window.open(link, "_blank");
-}
-
-function openModal(config){
-    currentLinks = config;
-    document.getElementById("modalTitle").innerText = config.title;
-    document.getElementById("firstGroup").innerText = config.firstText;
-    document.getElementById("secondGroup").innerText = config.secondText;
-    document.getElementById("groupModal").style.display = "flex";
-}
-
-function closeModal(){
-    document.getElementById("groupModal").style.display = "none";
-}
-
-document.getElementById("firstGroup").onclick = () => {
-    openLink(currentLinks.firstLink);
-    closeModal();
-};
-
-document.getElementById("secondGroup").onclick = () => {
-    openLink(currentLinks.secondLink);
-    closeModal();
 };
 
 function getWeekType(){
@@ -236,130 +164,140 @@ function updateHeaderInfo(weekType){
     const options = { day: 'numeric', month: 'long' };
     const dateStr = now.toLocaleDateString('uk-UA', options);
     const weekText = weekType === "even" ? "Парний" : "Непарний";
+
     document.getElementById("currentInfo").innerText =
         `Сьогодні: ${dateStr} • Поточний тиждень: ${weekText}`;
 }
 
 const savedTheme = localStorage.getItem("theme");
+
 if(savedTheme === "dark"){
     document.body.classList.add("dark");
 }
 
 document.getElementById("themeBtn").onclick = ()=>{
     document.body.classList.toggle("dark");
-    localStorage.setItem("theme",
+
+    localStorage.setItem(
+        "theme",
         document.body.classList.contains("dark") ? "dark" : "light"
     );
 };
 
 const scheduleData = {
+
 odd: {
     "Понеділок":[
-        {pair:1,type:"lecture",subject:"Вища математика",teacher:"Кирилова О.І.",link:links.math},
-        {pair:2,type:"practice",subject:"Фізика (Лаб)",teacher:"Горюк А.А.",link:links.physics}
+        {pair:1,type:"lecture",subject:"Морська практика",teacher:"Петриченко О.О."},
+        {pair:2,type:"lecture",subject:"Вища математика",teacher:"Кирилова О.І."},
+        {pair:3,type:"practice",subject:"Економічна теорія",teacher:"Яворська А.Ф."}
     ],
+
     "Вівторок":[
-        {pair:2,type:"lecture",subject:"Інформаційні технології",teacher:"Левінський М.В."},
-        {pair:3,type:"practice",subject:"Економічна теорія",teacher:"Яворська А.Ф.",link:links.econPractice}
+        {pair:1,type:"practice",subject:"Фізика (Лаб)",teacher:"Горюк А.А."},
+        {pair:2,type:"lecture",subject:"Фізика",teacher:"Горюк А.А."}
     ],
+
     "Середа":[
-        {pair:1,type:"practice",subject:"Океанські шляхи світу",teacher:"Кульбацький А.А."},
-        {pair:2,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"},
-        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"}
+        {pair:1,type:"practice",subject:"Морська практика",teacher:"Паладій С.А."},
+        {pair:2,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"}
     ],
+
     "Четвер":[
-        {pair:1,type:"lecture",subject:"Фізика",teacher:"Горюк А.А.",link:links.physics},
-        {pair:2,type:"practice",subject:"Інформаційні технології",teacher:"Левінський / Удолатій"},
-        {pair:3,type:"practice",subject:"Океанські шляхи світу",teacher:"Кульбацький А.А."}
+        {pair:1,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"},
+        {pair:3,type:"lecture",subject:"Інформаційні технології",teacher:"Левінський М.В."}
     ],
+
     "Пʼятниця":[
-        {pair:1,type:"lecture",subject:"Океанські шляхи світу",teacher:"Кульбацький А.А."},
-        {pair:2,type:"lecture",subject:"Суспільство і держава",teacher:"Скоробагатько А.В."},
-        {pair:3,type:"practice",subject:"Вища математика",teacher:"Демидов О.В.",link:links.math}
+        {pair:2,type:"practice",subject:"Вища математика",teacher:"Демидов О.В."},
+        {pair:3,type:"practice",subject:"Інформаційні технології",teacher:"Левінський / Удолатій"}
     ]
 },
+
 even: {
     "Понеділок":[
-        {pair:1,type:"lecture",subject:"Вища математика",teacher:"Кирилова О.І.",link:links.math},
-        {pair:2,type:"practice",subject:"Фізика (Лаб)",teacher:"Горюк А.А.",link:links.physics}
+        {pair:1,type:"practice",subject:"Фізика (Лаб)",teacher:"Горюк А.А."},
+        {pair:2,type:"lecture",subject:"Вища математика",teacher:"Кирилова О.І."},
+        {pair:3,type:"lecture",subject:"Економічна теорія",teacher:"Голубкова І.А."}
     ],
+
     "Вівторок":[
-        {pair:1,type:"lecture",subject:"Морська практика",teacher:"Петриченко О.О."},
-        {pair:2,type:"lecture",subject:"Інформаційні технології",teacher:"Левінський М.В."},
-        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"}
+        {pair:1,type:"practice",subject:"Океанські шляхи світу",teacher:"Кульбацький А.А."},
+        {pair:2,type:"lecture",subject:"Фізика",teacher:"Горюк А.А."},
+        {pair:3,type:"practice",subject:"Морська практика",teacher:"Паладій С.А."}
     ],
+
     "Середа":[
-        {pair:1,type:"practice",subject:"Суспільство і держава",teacher:"Скоробагатько А.В."},
+        {pair:1,type:"practice",subject:"Морська практика",teacher:"Паладій С.А."},
         {pair:2,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"},
-        {pair:3,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"}
+        {pair:3,type:"lecture",subject:"Економічна теорія",teacher:"Голубкова І.А."}
     ],
+
     "Четвер":[
-        {pair:1,type:"lecture",subject:"Фізика",teacher:"Горюк А.А.",link:links.physics},
-        {pair:2,type:"practice",subject:"Інформаційні технології",teacher:"Левінський / Удолатій"}
+        {pair:1,type:"practice",subject:"Англійська мова",teacher:"Бондаренко / Хроленко"},
+        {pair:2,type:"practice",subject:"Суспільство і держава",teacher:"Скоробагатько А.В."},
+        {pair:3,type:"lecture",subject:"Суспільство і держава",teacher:"Скоробагатько А.В."}
     ],
+
     "Пʼятниця":[
         {pair:1,type:"lecture",subject:"Океанські шляхи світу",teacher:"Кульбацький А.А."},
-        {pair:2,type:"lecture",subject:"Економічна теорія",teacher:"Голубкова І.А.",link:links.econLecture},
-        {pair:3,type:"practice",subject:"Вища математика",teacher:"Демидов О.В.",link:links.math}
+        {pair:2,type:"practice",subject:"Вища математика",teacher:"Демидов О.В."},
+        {pair:3,type:"practice",subject:"Інформаційні технології",teacher:"Левінський / Удолатій"}
     ]
 }
+
 };
 
 function renderSchedule(type){
     updateHeaderInfo(type);
-    const root=document.getElementById("schedule");
-    root.innerHTML="";
-    Object.entries(scheduleData[type]).forEach(([day,lessons])=>{
-        const div=document.createElement("div");
-        div.className="day";
-        div.innerHTML=`<h2>${day}</h2>`;
-        lessons.forEach(item=>{
-            const s=document.createElement("div");
-            s.className=`subject ${item.type}`;
-            s.innerHTML=`<div class="pair-title">${item.pair}-я пара | <span class="pair-time">${pairTimes[item.pair]}</span></div><b>${item.subject}</b><br>${item.teacher}`;
-            s.onclick=()=>{
-                if(item.link) openLink(item.link);
-                else if(item.subject==="Англійська мова"){
-                    openModal({
-                        title:"Англійська мова",
-                        firstText:"1 підгрупа — Бондаренко",
-                        secondText:"2 підгрупа — Хроленко",
-                        firstLink:links.eng1,
-                        secondLink:links.eng2
-                    });
-                }
-                else if(item.subject==="Інформаційні технології"){
-                    openModal({
-                        title:"Інформаційні технології",
-                        firstText:"1 підгрупа — Левінський",
-                        secondText:"2 підгрупа — Удолатій Вікторія",
-                        firstLink:links.inf1,
-                        secondLink:links.inf2
-                    });
-                }
-            };
+
+    const root = document.getElementById("schedule");
+    root.innerHTML = "";
+
+    Object.entries(scheduleData[type]).forEach(([day, lessons]) => {
+
+        const div = document.createElement("div");
+        div.className = "day";
+        div.innerHTML = `<h2>${day}</h2>`;
+
+        lessons.forEach(item => {
+
+            const s = document.createElement("div");
+            s.className = `subject ${item.type}`;
+
+            s.innerHTML = `
+                <div class="pair-title">
+                    ${item.pair}-я пара |
+                    <span class="pair-time">${pairTimes[item.pair]}</span>
+                </div>
+                <b>${item.subject}</b><br>
+                ${item.teacher}
+            `;
+
             div.appendChild(s);
         });
+
         root.appendChild(div);
     });
 }
 
-const oddBtn=document.getElementById("oddBtn");
-const evenBtn=document.getElementById("evenBtn");
+const oddBtn = document.getElementById("oddBtn");
+const evenBtn = document.getElementById("evenBtn");
 
-oddBtn.onclick=()=>{
+oddBtn.onclick = ()=>{
     oddBtn.classList.add("active");
     evenBtn.classList.remove("active");
     renderSchedule("odd");
 };
 
-evenBtn.onclick=()=>{
+evenBtn.onclick = ()=>{
     evenBtn.classList.add("active");
     oddBtn.classList.remove("active");
     renderSchedule("even");
 };
 
 const currentWeek = getWeekType();
+
 if(currentWeek === "even"){
     evenBtn.classList.add("active");
     renderSchedule("even");
